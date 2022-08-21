@@ -39,6 +39,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: "center",
     alignItems: "center",
   },
+  showDistanceContent: {
+    dislpay: "flex",
+    flexDirection: "column",
+    textAlign: "center",
+  },
   mapContainer: {
     margin: 10,
     width: "100%",
@@ -105,16 +110,18 @@ export default function MainController() {
           <AirportCoordinateSelector
             type="from"
             updateCoordinate={updateCordinatesHandlerCallback}
+            selectedCoordinates={selectedCordinates}
           />
           <AirportCoordinateSelector
             type="to"
             updateCoordinate={updateCordinatesHandlerCallback}
+            selectedCoordinates={selectedCordinates}
           />
         </Box>
       </Paper>
       <Box className={classes.showDistance}>
         {distance && (
-          <Box>
+          <Box className={classes.showDistanceContent}>
             {" "}
             <h2>{`Distance: ${distance} mi`}</h2>
             <Button

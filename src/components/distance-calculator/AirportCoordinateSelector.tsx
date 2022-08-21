@@ -1,10 +1,13 @@
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { TextField, Autocomplete, Box } from "@mui/material";
 import { FlightTakeoff, FlightLand } from "@mui/icons-material";
 import { Theme } from "@mui/material/styles";
 import { makeStyles } from "@mui/styles";
 import { airports } from "../../data";
-import { CoordinateSelectorType } from "./MainController";
+import {
+  CoordinateSelectorType,
+  SelectedCoordinateType,
+} from "./MainController";
 
 const useStyles = makeStyles((theme: Theme) => ({
   selectorWrapper: {
@@ -24,11 +27,27 @@ const useStyles = makeStyles((theme: Theme) => ({
 type AirportCoordinateSelectorType = {
   type: string;
   updateCoordinate: (param: CoordinateSelectorType) => void;
+  selectedCoordinates?: SelectedCoordinateType;
 };
 
 function AirportCoordinateSelector(params: AirportCoordinateSelectorType) {
   const classes = useStyles();
-  const { type, updateCoordinate } = params;
+  const { type, updateCoordinate, selectedCoordinates } = params;
+  const [airportData, updateAirportData] = useState<typeof airports>(airports);
+
+  useEffect(() => {
+    if (selectedCoordinates?.to || selectedCoordinates?.from) {
+      updateAirportData(
+        airports.filter((a) => {
+          if (type === "to") {
+            return a.AIRPORT !== selectedCoordinates?.from?.name;
+          } else {
+            return a.AIRPORT !== selectedCoordinates?.to?.name;
+          }
+        })
+      );
+    }
+  }, [selectedCoordinates]);
 
   const updateAirportSelector = (name: string | null) => {
     const airportDetails = airports.find(
@@ -52,7 +71,9 @@ function AirportCoordinateSelector(params: AirportCoordinateSelectorType) {
         id="from"
         freeSolo
         className={classes.autoComplete}
-        options={airports.map((option) => `${option.AIRPORT} (${option.IATA})`)}
+        options={airportData.map(
+          (option) => `${option.AIRPORT} (${option.IATA})`
+        )}
         renderInput={(params) => (
           <TextField
             {...params}
